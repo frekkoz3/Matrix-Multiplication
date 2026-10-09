@@ -1,3 +1,0 @@
-/mnt/c/Users/Utente/Documents/Progetti/Matrxi Multiplication/build/CMakeFiles/matmul.dir
-/mnt/c/Users/Utente/Documents/Progetti/Matrxi Multiplication/build/CMakeFiles/edit_cache.dir
-/mnt/c/Users/Utente/Documents/Progetti/Matrxi Multiplication/build/CMakeFiles/rebuild_cache.dir
