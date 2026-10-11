@@ -7,10 +7,7 @@ This is an educational project to learn a bit about the CUDA framework, in parti
 ```bash
 matrix-multiplication/
 │
-├── CMakeLists.txt
-├── README.md
-│
-├── include/
+├── include/                    # headers file
 │   ├── cuda/
 │   │    └── matrix_mul.cuh
 │   ├── cpu/
@@ -20,9 +17,11 @@ matrix-multiplication/
 │   ├── Timer.hpp
 │   └── Utils.hpp
 │
-├── src/
-│   ├── cpu/
-│   │   └── matrix_mul.cpp
+├── results/                    # results files
+│
+├── src/                        # code base
+│   ├── cpu/                    
+│   │   └── matrix_mul.cpp      
 │   ├── cuda/
 │   │   └── matrix_mul.cu
 │   ├── main.cpp
@@ -31,7 +30,9 @@ matrix-multiplication/
 │   ├── Timer.cpp
 │   └── Utils.cpp
 │
-└── build/
+├── .gitignore
+├── Makefile
+└── README.md
 ```
 
 ## Problem formulation
@@ -60,11 +61,16 @@ The project includes multiple implementations of matrix multiplication for compa
 
 1. Serial CPU, a straightforward sequential implementation
 2. CUDA, GPU implementations with progressively more advanced optimizations
-3. cuBLAS — used as a reference point for GPU performance
+3. cuBLAS, used as a reference point for GPU performance
 
 ## Key metrics tracked
 
-For now the only metric that will be **total time**.\
+The metrics that will be tracked are **total time** and **GFLOPS**.\
+The first one is $t_{ms}$ and it is computed using inner-profiling expressed in millisecond.\
+The second one is $GFLOPS$ and it is computed in the following way (with the assumption of the total workload required for the matrix multiplication of two squared matrices $2n^3$):
+$$
+GFLOPS = \frac{2n^3}{t_{ms} 10^6}
+$$
 All the hyperparameters used for each specific implementation will be tracked as well.
 
 ## CLI Interface
