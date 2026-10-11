@@ -11,23 +11,25 @@ matrix-multiplication/
 ├── README.md
 │
 ├── include/
+│   ├── cuda/
+│   │    └── matrix_mul.cuh
+│   ├── cpu/
+│   │   └── matrix_mul.hpp
 │   ├── Matrix.hpp
 │   ├── Arguments.hpp
 │   ├── Timer.hpp
 │   └── Utils.hpp
 │
 ├── src/
+│   ├── cpu/
+│   │   └── matrix_mul.cpp
+│   ├── cuda/
+│   │   └── matrix_mul.cu
 │   ├── main.cpp
 │   ├── Arguments.cpp
 │   ├── Matrix.cpp
 │   ├── Timer.cpp
-│   ├── Utils.cpp
-│   │
-│   └── cuda/
-│       ├── matrix_mul.cu
-│       └── matrix_mul.cuh
-│
-├── results/
+│   └── Utils.cpp
 │
 └── build/
 ```
@@ -67,11 +69,11 @@ All the hyperparameters used for each specific implementation will be tracked as
 
 ## CLI Interface
 
-The command line interface will have really simple flags:
+The command line interface have really simple flags:
 
 ```bash
 --help          # Helper
---n             # Dimension of the square matrix
+--size          # Dimension of the square matrix
+--iteration     # Number of iterations to do
 --method        # Implementation to use
---where_save    # Path where to save profiling results
 ```
