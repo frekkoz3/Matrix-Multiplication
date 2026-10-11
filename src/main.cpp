@@ -65,9 +65,11 @@ int main(int argc, char* argv[])
         else if (args.method == "cuda_native")
         {
             // WARMUP
+            float gpuTime = 0.0;
+            cudaCublasMatrixMultiply(A, B, C, bytes, N, gpuTime);
             for (int iteration = 0; iteration < args.iterations; ++iteration)
             {
-                float gpuTime = 0.0f;
+                gpuTime = 0.0f;
                 cudaNaiveMatrixMultiply(A, B, C, bytes, N, gpuTime);
                 totalTime += gpuTime;
             }
