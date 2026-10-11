@@ -89,7 +89,7 @@ int main(int argc, char* argv[])
             cudaCublasMatrixMultiply(A, B, C, bytes, N, gpuTime);
             for (int iteration = 0; iteration < args.iterations; ++iteration)
             {
-                float gpuTime = 0.0;
+                gpuTime = 0.0;
                 cudaCublasMatrixMultiply(A, B, C, bytes, N, gpuTime);
                 totalTime += gpuTime;
             }
