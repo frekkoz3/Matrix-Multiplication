@@ -58,6 +58,18 @@ namespace
             );
         }
     }
+
+    std::string parseMethod(const std::string& value)
+    {
+        if (value.empty())
+        {
+            throw std::invalid_argument(
+            "Invalid value for --method: " + value
+            );
+        }
+        
+        return value;
+    }
 }
 
 Arguments parseArguments(int argc, char* argv[])
@@ -96,9 +108,16 @@ Arguments parseArguments(int argc, char* argv[])
 
             args.iterations = parseIterations(argv[++i]);
         }
-        else if (argument == "--no-verify")
+        else if (argument == "--method")
         {
-            args.verify = false;
+            if (i + 1 >= argc)
+            {
+                throw std::invalid_argument(
+                    "Missing value for --method"
+                );
+            }
+
+            args.method = parseMethod(argv[++i]);
         }
         else
         {
@@ -120,6 +139,5 @@ void printHelp()
         << "Options:\n"
         << "  -n, --size <N>          Matrix size (default: 1024)\n"
         << "  -i, --iterations <N>    Number of iterations (default: 1)\n"
-        << "      --no-verify         Disable result verification\n"
         << "  -h, --help              Show this help message\n";
 }

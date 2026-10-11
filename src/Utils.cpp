@@ -44,6 +44,13 @@ bool compareMatrices(
         {
             if (std::fabs(A(i, j) - B(i, j)) > tolerance)
             {
+                std::cerr << "Mismatch at (" << i << ", " << j << ")"
+                << ": actual = " << A(i, j)
+                << ", expected = " << B(i, j)
+                << ", difference = "
+                << std::abs(A(i, j) - B(i, j))
+                << '\n';
+
                 return false;
             }
         }

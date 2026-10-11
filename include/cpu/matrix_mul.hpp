@@ -2,7 +2,7 @@
 
 #include "Matrix.hpp"
 
-void matrixMultiply(
+void cpuMatrixMultiply(
     const Matrix& A,
     const Matrix& B,
     Matrix& C
