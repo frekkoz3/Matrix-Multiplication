@@ -64,6 +64,7 @@ int main(int argc, char* argv[])
         }
         else if (args.method == "cuda_native")
         {
+            // WARMUP
             for (int iteration = 0; iteration < args.iterations; ++iteration)
             {
                 float gpuTime = 0.0f;
@@ -73,6 +74,7 @@ int main(int argc, char* argv[])
         }
         else if (args.method == "cuda_tiling")
         {
+            // WARMUP
             for (int iteration = 0; iteration < args.iterations; ++iteration)
             {
                 float gpuTime = 0.0f;
@@ -82,6 +84,9 @@ int main(int argc, char* argv[])
         }
         else if (args.method == "cuda_cublas")
         {
+            // WARMUP -> this is not really measured
+            float gpuTime = 0.0;
+            cudaCublasMatrixMultiply(A, B, C, bytes, N, gpuTime);
             for (int iteration = 0; iteration < args.iterations; ++iteration)
             {
                 float gpuTime = 0.0;
