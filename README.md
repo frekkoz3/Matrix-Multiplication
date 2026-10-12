@@ -63,7 +63,7 @@ The project includes multiple implementations of matrix multiplication for compa
 2. CUDA, GPU implementations with progressively more advanced optimizations
 3. cuBLAS, used as a reference point for GPU performance
 
-> **Warmup** as a best practice for gpu benchmarking, a single matrix multiplication is performed without being measured on GPU. This is the warmup phase and it is necessary to set up everything before measuring the actual computational performances.
+> **Warmup** As a best practice for gpu benchmarking, a single matrix multiplication is performed without being measured on GPU. This is the warmup phase and it is necessary to set up everything before measuring the actual computational performances.
 
 ## Key metrics tracked
 
