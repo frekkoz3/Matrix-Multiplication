@@ -75,6 +75,17 @@ GFLOPS = \frac{2n^3}{t_{ms} 10^6}
 $$
 All the hyperparameters used for each specific implementation will be tracked as well.
 
+## Quick usage
+
+CUDA must be installed in order to use this code.
+
+Once it is installed (check that everything went fine with a simple `nvcc --version`), just compile everything and run the executable.
+
+```bash
+make
+./matmul 
+```
+
 ## CLI Interface
 
 The command line interface have really simple flags:
@@ -85,3 +96,11 @@ The command line interface have really simple flags:
 --iteration     # Number of iterations to do
 --method        # Implementation to use
 ```
+
+## Methods Table
+
+| Method Name | Specification |
+| - | - |
+| **cpu** | Simple cpu implementation |
+| **cuda_native** | Really basic cuda implementation. No tiling, minor memory coalescing |
+| **cuda_cublas** | Wrapper for SOTA `cublasSgemm` implementation |
