@@ -2,6 +2,9 @@
 
 #include <Matrix.hpp>
 
+#define TILE_SIZE 16
+#define BLOCK_SIZE 16
+
 void cudaNaiveMatrixMultiply(
     const Matrix& A,
     const Matrix& B,

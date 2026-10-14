@@ -64,8 +64,8 @@ void cudaNaiveMatrixMultiply(
     CUDA_CHECK(cudaMemcpy(d_A, A.data(), bytes, cudaMemcpyHostToDevice));
     CUDA_CHECK(cudaMemcpy(d_B, B.data(), bytes, cudaMemcpyHostToDevice));
 
-    // define block and grid size (16x16 threads per block)
-    dim3 blockDim(16, 16); // 16x16 threads per block
+    // define block and grid size (see matrix_mul.cuh to see BLOCK_SIZE. default 16)
+    dim3 blockDim(BLOCK_SIZE, BLOCK_SIZE);
     dim3 gridDim((N + blockDim.x - 1) / blockDim.x, (N + blockDim.y - 1) / blockDim.y);
 
     // using cuda events
@@ -102,6 +102,35 @@ void cudaNaiveMatrixMultiply(
     CUDA_CHECK(cudaFree(d_C));
 }
 
+__global__ static __global__ void tilingMM(float* A, float* B, float* C, int N){
+    __shared__ float tile_A[TILE_SIZE][TILE_SIZE];
+    __shared__ float tile_B[TILE_SIZE][TILE_SIZE];
+
+    int row = threadIdx.y + blockIdx.y * TILE_SIZE;
+    int col = threadIdx.x + blockIdx.x * TILE_SIZE;
+    float val = 0.0f;
+    for(int i = 0; i < (N + TILE_SIZE -1)/ TILE_SIZE; i++){
+        if(row < N && (i * TILE_SIZE + threadIdx.x) < N){
+            tile_A[threadIdx.y][threadIdx.x] = A[row * N + i * TILE_SIZE + threadIdx.x];
+        } else {
+            tile_A[threadIdx.y][threadIdx.x] = 0.0f;
+        }
+        if(col < N && (i * TILE_SIZE + threadIdx.y) < N){
+            tile_B[threadIdx.y][threadIdx.x] = B[(i * TILE_SIZE + threadIdx.y) * N + col];
+        } else {
+            tile_B[threadIdx.y][threadIdx.x] = 0.0f;
+        }
+        __syncthreads();
+        for(int j = 0; j < TILE_SIZE; j++){
+            val += tile_A[threadIdx.y][j] * tile_B[j][threadIdx.x];
+        }
+        __syncthreads();
+    }
+    if(row < N && col < N){
+        C[row * N + col] = val;
+    }
+}
+
 void cudaTilingMatrixMultiply(
     const Matrix& A,
     const Matrix& B,
@@ -110,7 +139,52 @@ void cudaTilingMatrixMultiply(
     const size_t N,
     float& milliseconds
 ){
-    C(0, 0) = A(0, 0) + B(0, 0); // placeholder
+    // device allocation
+    float *d_A, *d_B, *d_C;
+    CUDA_CHECK(cudaMalloc(&d_A, bytes));
+    CUDA_CHECK(cudaMalloc(&d_B, bytes));
+    CUDA_CHECK(cudaMalloc(&d_C, bytes));
+
+    // copy A and B host -> device
+    CUDA_CHECK(cudaMemcpy(d_A, A.data(), bytes, cudaMemcpyHostToDevice));
+    CUDA_CHECK(cudaMemcpy(d_B, B.data(), bytes, cudaMemcpyHostToDevice));
+
+    // define block and grid size (see matrix_mul.cuh to see BLOCK_SIZE. default 16)
+    dim3 blockDim(BLOCK_SIZE, BLOCK_SIZE);
+    dim3 gridDim((N + blockDim.x - 1) / blockDim.x, (N + blockDim.y - 1) / blockDim.y);
+
+    // using cuda events
+    cudaEvent_t start, stop;
+    CUDA_CHECK(cudaEventCreate(&start));
+    CUDA_CHECK(cudaEventCreate(&stop));
+
+    // start
+    CUDA_CHECK(cudaEventRecord(start)); 
+
+    // matmul
+    tilingMM<<<gridDim, blockDim>>>(d_A, d_B, d_C, N);
+
+    // synch
+    CUDA_CHECK(cudaDeviceSynchronize());
+
+    // end
+    CUDA_CHECK(cudaEventRecord(stop));
+    CUDA_CHECK(cudaEventSynchronize(stop)); // synch
+
+    // compute actual elapsed time in millisecond
+    CUDA_CHECK(cudaEventElapsedTime(&milliseconds, start, stop));
+
+    // destroy events
+    CUDA_CHECK(cudaEventDestroy(start));
+    CUDA_CHECK(cudaEventDestroy(stop));
+
+    // copy C device -> host; this waits for the (asynchronous) cublas call to finish
+    CUDA_CHECK(cudaMemcpy(C.data(), d_C, bytes, cudaMemcpyDeviceToHost));
+
+    // free device memory
+    CUDA_CHECK(cudaFree(d_A));
+    CUDA_CHECK(cudaFree(d_B));
+    CUDA_CHECK(cudaFree(d_C));
 }
 
 void cudaCublasMatrixMultiply(
